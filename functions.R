@@ -2,7 +2,7 @@
 # Define term vectors that define sub-classes and put them in a terms list, e.g.:
 # telephone <- c("bt","three","vodafone","talktalk")
 # terms <- list("Telephone" = telephone)
-# This is contained in my own personal.R file, you can create you own based on your own transactions
+# This is contained in my own personal.R file, you can create your own based on your own transactions
 source("personal.R")
 
 classify_expense <- function(expense) {
