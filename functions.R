@@ -64,7 +64,7 @@ import_files <- function(filepath) {
     select(t_date, t_month, t_type, t_desc, amount, balance)
 }
 
-
+# function to remove any trace of transactions above a certain threshold within a period
 remove_transaction <- function(df, threshold, from, to) {
   
   tr_rows <- which(abs(df$amount) >= threshold & 
