@@ -1,0 +1,19 @@
+Transaction Date,Transaction Type,Transaction Description,Debit Amount,Credit Amount,Balance
+30/11/2017,DEB,amazon,25.05,,2718.77
+30/11/2017,BGC,salary,,2000,2743.82
+29/11/2017,FPO,window cleaning,10,,743.82
+28/11/2017,DEB,tesco,7.3,,753.82
+27/11/2017,DEB,card fee,0.5,,761.12
+23/11/2017,DEB,newspapers,3.7,,761.62
+22/11/2017,DEB,tesco,5.9,,765.32
+22/11/2017,FPO,transfer,20,,771.22
+21/11/2017,DEB,asda,6.5,,791.22
+21/11/2017,DEB,costa,8.5,,797.72
+21/11/2017,DEB,wh smith,2,,806.22
+20/11/2017,DEB,nandos,24.75,,808.22
+20/11/2017,DEB,sportsdirect,27,,832.97
+20/11/2017,DEB,asda,16.65,,859.97
+20/11/2017,DEB,paypal,39.95,,876.62
+17/11/2017,DEB,pay at pump,19.59,,916.57
+14/11/2017,DEB,tesco,42.66,,936.16
+13/11/2017,DEB,tesco,21.18,,978.82

@@ -41,35 +41,41 @@ match_exists <- function(string_to_classify, terms) {
 }
 
 
-import_files <- function(filepath) {
+import_files <- function(filepath, bank) {
   
-  files <- list.files(filepath)
-  filenames <- paste(filepath, files, sep = "/")
+  bank_filepath <- paste(filepath, bank, sep = "/")
+  files <- list.files(bank_filepath)
+  filenames <- paste(bank_filepath, files, sep = "/")
   
   #read data; row field is a way of preserving row order of files
   #get rid of account number/sort code, rename fields, replace NA with 0, combine credit and debit,
   #sort by date order, remove unnecessary fields
-  map_df(filenames, function(x) {read_csv(x,col_types="cccccddd") %>% rownames_to_column("row")}) %>%
-    select(-4,-5) %>%
+  map_df(filenames, function(x) {read_csv(x,
+                                          col_types = case_when(
+                                                                bank == "tsb" ~ "cccccddd",
+                                                                bank == "halifax" ~ "cccddd")) %>% 
+                                 rownames_to_column("row")}) %>%
+    select_if(!(names(.) %in% c("Sort Code", "Account Number"))) %>%
     rename(t_date = `Transaction Date`,
            t_type = `Transaction Type`,
            t_desc = `Transaction Description`,
            balance = Balance) %>%
     replace_na(list(`Debit Amount` = 0, `Credit Amount` = 0)) %>%
     mutate(row = as.integer(row),
-           t_date = as.Date(t_date, "%d/%m/%Y"),
-           t_month = format(t_date, "%Y/%m"),
+           t_date = dmy(t_date),
+           t_month = paste(month(t_date, label = TRUE), year(t_date)),
            amount = `Credit Amount` - `Debit Amount`) %>%
     arrange(t_date, desc(row)) %>%
     select(t_date, t_month, t_type, t_desc, amount, balance)
 }
 
+
 # function to remove any trace of transactions above a certain threshold within a period
 remove_transaction <- function(df, threshold, from, to) {
   
   tr_rows <- which(abs(df$amount) >= threshold & 
-                    df$t_date >= as.Date(from, "%d/%m/%Y") & 
-                     df$t_date <= as.Date(to, "%d/%m/%Y"))
+                    df$t_date >= dmy(from) & 
+                     df$t_date <= dmy(to))
   
   # go through each row in turn
   for (row in tr_rows) {

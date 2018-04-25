@@ -1,7 +1,12 @@
 library(tidyverse)
+library(lubridate)
 source("functions.R")
 
-df <- import_files("./personal_files")
+tsb <- import_files("./personal_files", "tsb")
+halifax <- import_files("./personal_files", "halifax")
+
+df <- bind_rows(halifax, tsb) %>%
+      mutate(t_month = t_month %>% factor(levels = unique(.)))
 
 #add expense groupings
 df <- df %>% mutate(t_class = map_chr(t_desc, classify_expense))
@@ -28,7 +33,8 @@ df %>%
     filter(amount < 0) %>%
     filter(t_class != "Special" & t_class != "Holidays") %>%
     ggplot(aes(x=t_month,y=abs(amount),fill=t_class)) + 
-      geom_bar(stat="identity")
+      geom_bar(stat="identity") +
+      theme(axis.text.x = element_text(angle = 45))
   
   #breakdown each month - class facets
   df %>%
@@ -53,4 +59,8 @@ df %>%
     summarise(total = abs(sum(amount))) %>%
     ggplot(aes(x=t_month, y=total)) +
     geom_bar(stat = "identity")
+  
+  
+##########TESTING GOOGLEDRIVE LIBRARY
+  library(googledrive)
   
