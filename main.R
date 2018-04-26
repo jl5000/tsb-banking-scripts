@@ -5,17 +5,22 @@ source("functions.R")
 tsb <- import_files("./personal_files", "tsb")
 halifax <- import_files("./personal_files", "halifax")
 
-df <- bind_rows(halifax, tsb) %>%
+df_combine <- bind_rows(halifax, tsb) %>%
       mutate(t_month = t_month %>% factor(levels = unique(.)))
 
+# remove credit/debit lines I don't want to include (ensure they sum to zero)
+df_combine_clean <- df_combine %>% remove_transaction(9000, "21/08/2017", "25/08/2017") %>%
+                                  remove_transaction(1000, "08/01/2018", "08/01/2018") %>%
+                                  remove_transaction(5000, "19/02/2016", "24/02/2016")
+
 #add expense groupings
-df <- df %>% mutate(t_class = map_chr(t_desc, classify_expense))
+df_combine_clean_classified <- df_combine_clean %>% 
+                                mutate(t_class = map_chr(t_desc, classify_expense))
 
-# remove credit lines I don't want to include
-df <- df %>% remove_transaction(9000, "01/08/2017", "31/08/2017")
-# remove debit lines  I don't want to include
-df <- df %>% remove_transaction(1000, "05/01/2018", "09/01/2018")
+# add manual expenses for one-off big expenditures
+df <- df_combine_clean_classified %>% custom_expense()
 
+rm(df_combine, df_combine_clean, df_combine_clean_classified)
 
 #check misc entries to see if any additions need to be made to personal.R - focus on high value
 df %>%
