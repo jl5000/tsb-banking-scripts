@@ -17,16 +17,23 @@ df <- df %>% remove_transaction(9000, "01/08/2017", "31/08/2017")
 df <- df %>% remove_transaction(1000, "05/01/2018", "09/01/2018")
 
 
-#check misc entries to see if any additions need to be made to personal.R
+#check misc entries to see if any additions need to be made to personal.R - focus on high value
 df %>%
   filter(t_class == "Misc") %>%
   filter(amount < 0) %>%
-  distinct(t_desc) %>%
+  group_by(t_desc) %>%
+  summarise(total = sum(amount)) %>%
+  arrange(total) %>%
   View()
 
 #core plot - balance over time
   df %>% 
-    ggplot(aes(x=t_date,y=balance)) + geom_line() + geom_smooth(se=FALSE)
+    ggplot(aes(x=t_date,y=balance)) + 
+    geom_line() + 
+    geom_smooth()
+  
+  # View transactions containing string
+  df %>% filter(str_detect(t_desc, "SIGNATURE")) %>% View()
 
   #breakdown each month - stacked bar
   df %>%
@@ -34,7 +41,7 @@ df %>%
     filter(t_class != "Special" & t_class != "Holidays") %>%
     ggplot(aes(x=t_month,y=abs(amount),fill=t_class)) + 
       geom_bar(stat="identity") +
-      theme(axis.text.x = element_text(angle = 45))
+    theme(axis.text.x = element_text(angle = 45))
   
   #breakdown each month - class facets
   df %>%
@@ -58,7 +65,8 @@ df %>%
     group_by(t_month) %>%
     summarise(total = abs(sum(amount))) %>%
     ggplot(aes(x=t_month, y=total)) +
-    geom_bar(stat = "identity")
+    geom_bar(stat = "identity") +
+    theme(axis.text.x = element_text(angle = 45))
   
   
 ##########TESTING GOOGLEDRIVE LIBRARY
